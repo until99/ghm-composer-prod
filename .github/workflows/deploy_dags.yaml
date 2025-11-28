@@ -24,4 +24,4 @@ jobs:
 
       - name: Sync DAGs to GCS
         run: |
-          gcloud storage rsync -r -d ./dags gs://${{ secrets.GCS_BUCKET }}/dags
+          gcloud storage rsync -r ./dags gs://${{ secrets.GCS_BUCKET }}/dags --delete-unmatched-destination-objects
