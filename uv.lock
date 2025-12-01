@@ -410,6 +410,21 @@ wheels = [
 ]
 
 [[package]]
+name = "apache-airflow-providers-oracle"
+version = "4.2.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "apache-airflow" },
+    { name = "apache-airflow-providers-common-compat" },
+    { name = "apache-airflow-providers-common-sql" },
+    { name = "oracledb" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f3/66/cefe513be6a8cf311cd56506df4c5cbfae98c59c7a46d5f412bb1c6d6767/apache_airflow_providers_oracle-4.2.1.tar.gz", hash = "sha256:621b4dcfff5488d5b0c474d22f0fa18db1f210aaae9d6cb3cb732c0f16aa5f8c", size = 34057, upload-time = "2025-11-17T19:11:24.147Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f5/86/00dbc9fe64a9ba863aa95904c2a68ce499fbe5ab4b07681db99dda4f46ff/apache_airflow_providers_oracle-4.2.1-py3-none-any.whl", hash = "sha256:20b139efb937a404e0bd2c7755ca82cd8aeea11d7767ca930b49b0cf11d5fdac", size = 24792, upload-time = "2025-11-17T19:09:33.459Z" },
+]
+
+[[package]]
 name = "apache-airflow-providers-smtp"
 version = "2.3.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1235,6 +1250,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "apache-airflow" },
     { name = "apache-airflow-providers-google" },
+    { name = "apache-airflow-providers-oracle" },
     { name = "oracledb" },
     { name = "pandas" },
     { name = "pandas-gbq" },
@@ -1245,6 +1261,7 @@ dependencies = [
 requires-dist = [
     { name = "apache-airflow", specifier = "==2.10.2" },
     { name = "apache-airflow-providers-google", specifier = ">=19.0.0" },
+    { name = "apache-airflow-providers-oracle", specifier = ">=4.2.1" },
     { name = "oracledb", specifier = ">=3.4.1" },
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "pandas-gbq", specifier = ">=0.31.0" },
