@@ -5,11 +5,7 @@ Factory para criar DAGs com padrões consistentes e dependências de datasets.
 from airflow import DAG, Dataset
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
-
-try:
-    from .yaml_loader import get_pipeline_config, get_global_config, get_all_pipelines
-except ImportError:
-    from yaml_loader import get_pipeline_config, get_global_config, get_all_pipelines
+from utils.yaml_loader import get_pipeline_config, get_global_config, get_all_pipelines
 
 
 def create_dag(

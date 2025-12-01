@@ -42,7 +42,6 @@ def create_oracle_to_gcs_task(
         bucket=bucket,
         filename=gcs_path,
         export_format=export_format,
-        ensure_ascii=False,
         **kwargs,
     )
 

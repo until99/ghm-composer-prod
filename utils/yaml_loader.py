@@ -45,7 +45,7 @@ class PipelineYamlConfig:
     @property
     def full_table_id(self) -> str:
         """Retorna ID completo da tabela."""
-        from .yaml_loader import get_global_config
+        from utils.yaml_loader import get_global_config
 
         config = get_global_config()
         return f"{config.project_id}.{self.dataset}.{self.table}"
