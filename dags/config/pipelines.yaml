@@ -1,0 +1,52 @@
+# Configuração de Pipelines - GHM Composer
+# Este arquivo define todas as pipelines do projeto
+
+global:
+  project_id: ghm-data-prod
+  oracle_conn_id: tasy_prod_oracle_conn
+  bucket_name: ghm-data-prod-composer-bucket-001
+  default_retries: 0
+  default_retry_delay: 300
+
+bronze:
+  tb_medico:
+    dataset: bronze_medicos
+    table: tb_medico
+    schedule: "@monthly"
+    sql_file: bronze_tb_medico.sql
+    gcs_path: stage/tb_medico/{{ ds }}/dados.parquet
+    write_disposition: WRITE_TRUNCATE
+    owner: Gabriel Kasten
+    tags:
+      - bronze
+      - oracle
+      - tasy
+      - medico
+# silver:
+#   # Dimensão de Pacientes
+#   dim_paciente:
+#     dataset: silver_dimensions
+#     table: dim_paciente
+#     sql_file: silver_dim_paciente.sql
+#     write_disposition: WRITE_TRUNCATE
+#     tags:
+#       - silver
+#       - dimension
+#       - paciente
+#     dependencies:
+#       - bronze_td_paciente
+#       - bronze_tb_atendimento_paciente
+
+# gold:
+#   # Fato de Atendimentos
+#   fato_atendimento:
+#     dataset: gold_facts
+#     table: fato_atendimento
+#     sql_file: gold_fato_atendimento.sql
+#     write_disposition: WRITE_TRUNCATE
+#     tags:
+#       - gold
+#       - fact
+#       - atendimento
+#     dependencies:
+#       - silver_dim_paciente
