@@ -84,12 +84,6 @@ WHERE DT_ATUALIZACAO >= TRUNC(SYSDATE - 1)
 git add config/pipelines.yaml sql/bronze_nova_tabela.sql
 git commit -m "feat: adiciona pipeline bronze_nova_tabela"
 git push
-
-# Sync para Composer
-gsutil -m rsync -r config/ gs://SEU_BUCKET/config/
-gsutil -m rsync -r dags/ gs://SEU_BUCKET/dags/
-gsutil -m rsync -r sql/ gs://SEU_BUCKET/sql/
-gsutil -m rsync -r utils/ gs://SEU_BUCKET/utils/
 ```
 
 **Pronto!** A DAG `bronze_nova_tabela` será criada automaticamente. ✨
@@ -105,39 +99,38 @@ global:
   project_id: ghm-data-prod
   oracle_conn_id: tasy_prod_oracle_conn
   bucket_name: ghm-data-prod-composer-bucket-001
-  default_owner: Gabriel Kasten
-  default_retries: 1
+  default_retries: 0
   default_retry_delay: 300
 
 bronze:
-  td_paciente:
-    dataset: bronze_td_paciente
-    table: td_paciente
+  tb_raw:
+    dataset: bronze_tb_raw
+    table: tb_raw
     schedule: "@daily"
-    sql_file: bronze_td_paciente.sql
-    gcs_path: stage/td_paciente/{{ ds }}/dados.parquet
-    write_disposition: WRITE_APPEND
-    tags: [bronze, oracle, tasy, paciente]
+    sql_file: bronze_tb_raw.sql
+    gcs_path: stage/tb_raw/{{ ds }}/dados.parquet
+    write_disposition: WRITE_APPEND | WRITE_TRUNCATE | WRITE_EMPTY
+    tags: [bronze, oracle, tasy, raw]
 
 silver:
-  paciente_consolidated:
-    dataset: silver_analytics
-    table: paciente_consolidated
-    sql_file: silver_paciente_consolidated.sql
+  td_raw:
+    dataset: silver_td_raw
+    table: td_raw
+    sql_file: silver_td_raw.sql
     write_disposition: WRITE_TRUNCATE
-    tags: [silver, analytics, paciente]
+    tags: [silver, dimension, raw]
     dependencies:
-      - bronze_td_paciente # Aguarda Bronze completar
+      - bronze_td_raw # Aguarda Bronze completar
 
 gold:
-  paciente_metrics:
-    dataset: gold_analytics
-    table: paciente_metrics
-    sql_file: gold_paciente_metrics.sql
+  tf_raw:
+    dataset: gold_raw
+    table: tf_raw
+    sql_file: gold_tf_raw.sql
     write_disposition: WRITE_TRUNCATE
     tags: [gold, analytics, metrics]
     dependencies:
-      - silver_paciente_consolidated # Aguarda Silver completar
+      - silver_td_raw # Aguarda Silver completar
 ```
 
 ### Campos Disponíveis
@@ -171,28 +164,6 @@ gold:
 - `write_disposition`: `WRITE_TRUNCATE` (geralmente)
 - `tags`: Lista de tags
 - `dependencies`: Lista de DAGs que devem completar antes
-
-### Configurações Avançadas (opcional)
-
-```yaml
-advanced:
-  timeouts:
-    bronze_tabela_grande: 7200 # 2 horas
-
-  partitioning:
-    gold_metricas_diarias:
-      type: DAY
-      field: dt_calculo
-
-  clustering:
-    silver_paciente_consolidated:
-      fields: [cd_paciente, status_paciente]
-
-  retry_config:
-    bronze_importante:
-      retries: 5
-      retry_delay: 900 # 15 min
-```
 
 ---
 
@@ -295,9 +266,9 @@ Todas as configurações do YAML (retries, timeouts, dependencies, tags) são ap
 
 ### Tags por Layer
 
-- **Bronze**: `[bronze, oracle, tasy, dominio]`
-- **Silver**: `[silver, analytics, dominio]`
-- **Gold**: `[gold, analytics, metrics]`
+- **Bronze**: `[bronze, oracle, tasy, tb, dominio]`
+- **Silver**: `[silver, td, dominio]`
+- **Gold**: `[gold, tf, metrics]`
 
 ### Write Disposition
 
@@ -342,7 +313,6 @@ reload_config()
 2. Crie arquivo SQL correspondente
 3. Teste localmente (`uv sync`, validação)
 4. Commit com mensagem descritiva
-5. Deploy para staging → validar → produção
 
 ---
 

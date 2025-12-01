@@ -50,23 +50,3 @@ bronze:
 #       - atendimento
 #     dependencies:
 #       - silver_dim_paciente
-
-# advanced:
-#   timeouts:
-#     bronze_tb_atendimento_paciente: 7200 # 2 horas
-
-#   partitioning:
-#     gold_fato_atendimento:
-#       type: DAY
-#       field: dt_atendimento
-
-#   clustering:
-#     silver_dim_paciente:
-#       fields:
-#         - cd_paciente
-#         - status_paciente
-
-#   retry_config:
-#     bronze_td_paciente:
-#       retries: 3
-#       retry_delay: 600

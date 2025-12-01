@@ -5,7 +5,16 @@ Este arquivo lê config/pipelines.yaml e cria dinamicamente todas as DAGs
 definidas na configuração. Não é necessário criar arquivos .py para cada DAG.
 """
 
+import sys
+import os
 from datetime import datetime
+
+# Adiciona o diretório raiz ao Python path para importar utils
+dag_folder = os.path.dirname(os.path.abspath(__file__))
+root_folder = os.path.dirname(dag_folder)
+if root_folder not in sys.path:
+    sys.path.insert(0, root_folder)
+
 from utils import (
     read_sql_file,
     create_dag,
