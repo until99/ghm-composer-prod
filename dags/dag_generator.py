@@ -21,15 +21,50 @@ if root_folder not in sys.path:
 if dag_folder not in sys.path:
     sys.path.insert(0, dag_folder)
 
-# Imports diretos dos módulos
-from utils.sql_helpers import read_sql_file
-from utils.dag_factory import create_dag, get_dag_outlets
-from utils.task_templates import (
-    create_oracle_to_gcs_task,
-    create_gcs_to_bigquery_task,
-    create_bigquery_transform_task,
-)
-from utils.yaml_loader import get_global_config, get_all_pipelines
+# Import condicional baseado na localização
+try:
+    # Tenta import quando utils está em dags/utils/
+    from utils.sql_helpers import read_sql_file
+    from utils.dag_factory import create_dag, get_dag_outlets
+    from utils.task_templates import (
+        create_oracle_to_gcs_task,
+        create_gcs_to_bigquery_task,
+        create_bigquery_transform_task,
+    )
+    from utils.yaml_loader import get_global_config, get_all_pipelines
+except ModuleNotFoundError:
+    # Fallback: importa diretamente dos arquivos
+    import importlib.util
+    
+    utils_path = os.path.join(dag_folder, 'utils')
+    
+    # sql_helpers
+    spec = importlib.util.spec_from_file_location("sql_helpers", os.path.join(utils_path, "sql_helpers.py"))
+    sql_helpers = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(sql_helpers)
+    read_sql_file = sql_helpers.read_sql_file
+    
+    # dag_factory
+    spec = importlib.util.spec_from_file_location("dag_factory", os.path.join(utils_path, "dag_factory.py"))
+    dag_factory = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(dag_factory)
+    create_dag = dag_factory.create_dag
+    get_dag_outlets = dag_factory.get_dag_outlets
+    
+    # task_templates
+    spec = importlib.util.spec_from_file_location("task_templates", os.path.join(utils_path, "task_templates.py"))
+    task_templates = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(task_templates)
+    create_oracle_to_gcs_task = task_templates.create_oracle_to_gcs_task
+    create_gcs_to_bigquery_task = task_templates.create_gcs_to_bigquery_task
+    create_bigquery_transform_task = task_templates.create_bigquery_transform_task
+    
+    # yaml_loader
+    spec = importlib.util.spec_from_file_location("yaml_loader", os.path.join(utils_path, "yaml_loader.py"))
+    yaml_loader = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(yaml_loader)
+    get_global_config = yaml_loader.get_global_config
+    get_all_pipelines = yaml_loader.get_all_pipelines
 
 # Carrega configuração global
 global_config = get_global_config()
