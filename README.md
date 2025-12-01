@@ -86,6 +86,13 @@ git commit -m "feat: adiciona pipeline bronze_nova_tabela"
 git push
 ```
 
+O CI/CD automaticamente faz sync de:
+
+- `dags/` → `gs://BUCKET/dags/`
+- `utils/` → `gs://BUCKET/dags/utils/`
+- `config/` → `gs://BUCKET/config/`
+- `sql/` → `gs://BUCKET/sql/`
+
 **Pronto!** A DAG `bronze_nova_tabela` será criada automaticamente. ✨
 
 ---

@@ -9,11 +9,17 @@ import sys
 import os
 from datetime import datetime
 
-# Adiciona o diretório raiz ao Python path para importar utils
+# Adiciona os diretórios necessários ao Python path
 dag_folder = os.path.dirname(os.path.abspath(__file__))
 root_folder = os.path.dirname(dag_folder)
+
+# Adiciona root folder (para importar utils quando estiver fora de dags/)
 if root_folder not in sys.path:
     sys.path.insert(0, root_folder)
+
+# Adiciona dag folder (para importar utils quando estiver em dags/utils/)
+if dag_folder not in sys.path:
+    sys.path.insert(0, dag_folder)
 
 from utils import (
     read_sql_file,
