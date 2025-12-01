@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "dags/**"
+      - "config/pipelines.yaml"
 
   workflow_dispatch:
 
