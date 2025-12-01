@@ -5,7 +5,11 @@ Factory para criar DAGs com padrões consistentes e dependências de datasets.
 from airflow import DAG, Dataset
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
-from .yaml_loader import get_pipeline_config, get_global_config, get_all_pipelines
+
+try:
+    from .yaml_loader import get_pipeline_config, get_global_config, get_all_pipelines
+except ImportError:
+    from yaml_loader import get_pipeline_config, get_global_config, get_all_pipelines
 
 
 def create_dag(
@@ -34,7 +38,6 @@ def create_dag(
     """
     global_config = get_global_config()
 
-    # Default args padrão
     dag_default_args = {
         "owner": global_config.default_owner,
         "retries": global_config.default_retries,
@@ -44,7 +47,6 @@ def create_dag(
     if default_args:
         dag_default_args.update(default_args)
 
-    # Se usar YAML config, carrega dependências e schedule
     schedule = kwargs.pop("schedule_interval", None)
     outlets = None
 
@@ -52,7 +54,6 @@ def create_dag(
         try:
             pipeline_config = get_pipeline_config(dag_id)
 
-            # Override com configurações customizadas do YAML
             if pipeline_config.retries is not None:
                 dag_default_args["retries"] = pipeline_config.retries
 
@@ -61,11 +62,9 @@ def create_dag(
                     seconds=pipeline_config.retry_delay
                 )
 
-            # Define schedule (None para DAGs triggered por dataset)
             if schedule is None:
                 schedule = pipeline_config.schedule
 
-            # Configura dataset triggers (dependências upstream)
             if pipeline_config.dependencies:
                 all_pipelines = get_all_pipelines()
                 schedule = []
@@ -74,18 +73,14 @@ def create_dag(
                         dep_config = all_pipelines[dep_dag_id]
                         schedule.append(Dataset(dep_config.dataset_uri))
 
-            # Configura outlets (datasets que essa DAG atualiza)
             outlets = [Dataset(pipeline_config.dataset_uri)]
 
-            # Tags do YAML
             if not tags and pipeline_config.tags:
                 tags = pipeline_config.tags
 
         except (ValueError, KeyError):
-            # Se não encontrar config, usa valores fornecidos
             pass
 
-    # Cria a DAG
     dag = DAG(
         dag_id=dag_id,
         start_date=start_date,
@@ -96,7 +91,6 @@ def create_dag(
         **kwargs,
     )
 
-    # Armazena outlets para uso nas tasks
     if outlets:
         dag.outlets = outlets
 

@@ -27,6 +27,10 @@ def read_sql_file(filename: str, sql_folder: Optional[str] = None) -> str:
         project_root = Path(__file__).parent.parent
         sql_path = project_root / "sql" / filename
 
+        if not sql_path.exists():
+            project_root = Path(__file__).parent.parent.parent
+            sql_path = project_root / "sql" / filename
+
     if not sql_path.exists():
         raise FileNotFoundError(f"Arquivo SQL não encontrado: {sql_path}")
 

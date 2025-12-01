@@ -67,9 +67,12 @@ class YamlConfigLoader:
             config_path: Caminho para o arquivo YAML. Se None, usa o padrão.
         """
         if config_path is None:
-            # Assume que está em utils/ e config/ está no mesmo nível
             project_root = Path(__file__).parent.parent
             config_path = project_root / "config" / "pipelines.yaml"
+
+            if not config_path.exists():
+                project_root = Path(__file__).parent.parent.parent
+                config_path = project_root / "config" / "pipelines.yaml"
 
         self.config_path = config_path
         self._raw_config: Optional[Dict] = None
