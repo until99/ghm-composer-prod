@@ -21,16 +21,15 @@ if root_folder not in sys.path:
 if dag_folder not in sys.path:
     sys.path.insert(0, dag_folder)
 
-from utils import (
-    read_sql_file,
-    create_dag,
-    get_dag_outlets,
+# Imports diretos dos módulos
+from utils.sql_helpers import read_sql_file
+from utils.dag_factory import create_dag, get_dag_outlets
+from utils.task_templates import (
     create_oracle_to_gcs_task,
     create_gcs_to_bigquery_task,
     create_bigquery_transform_task,
-    get_global_config,
-    get_all_pipelines,
 )
+from utils.yaml_loader import get_global_config, get_all_pipelines
 
 # Carrega configuração global
 global_config = get_global_config()
